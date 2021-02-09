@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import personService from '../services/persons'
 
 const PersonForm = ({ persons, setPersons }) => {
     const [ newName, setNewName ] = useState('')
@@ -9,13 +10,15 @@ const PersonForm = ({ persons, setPersons }) => {
     const addPerson = (event) => {
         event.preventDefault()
         const person = {
-          id: persons.length + 1,
           name: newName,
           number: newNumber,
         }
         if (!(persons.map((person) => person.name)).includes(newName)) {
-          // console.log(names.includes(newName))
-          setPersons(persons.concat(person))
+          personService
+            .create(person)
+            .then(returnedPerson => {
+              setPersons(persons.concat(returnedPerson))
+          })
           setNewName('')
           setnewNumber('')
         } else {
