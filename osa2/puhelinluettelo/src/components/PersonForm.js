@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import personService from '../services/persons'
 
-const PersonForm = ({ persons, setPersons }) => {
+const PersonForm = ({ persons, setPersons, setNotification, setNotificationStyle }) => {
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setnewNumber] = useState('')
     const handleNameChange = (event) => setNewName(event.target.value)
@@ -21,16 +21,27 @@ const PersonForm = ({ persons, setPersons }) => {
           })
           setNewName('')
           setnewNumber('')
+          setNotificationStyle('success')
+          setNotification(`Added ${newName}`)
+          
         } else {
           if (window.confirm(`${person.name} is already added to phonebook,  replace old number with a new one?`)) {
             const id = persons.filter(p => p.name === person.name)[0].id
             personService.update({id: id, ...person}).then(updatedPerson => {
               setPersons(persons.map(person => person.id !== id ? person : updatedPerson))
+              setNotificationStyle('success')
+          setNotification(`Updated ${newName}`)
+            }).catch(error => {
+              setNotificationStyle('error')
+              setNotification(`Information of ${newName} has already been removed from the server`)
             })
             setNewName('')
             setnewNumber('')
           }
         }
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       }
 
     return (
