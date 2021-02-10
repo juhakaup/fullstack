@@ -22,8 +22,14 @@ const PersonForm = ({ persons, setPersons }) => {
           setNewName('')
           setnewNumber('')
         } else {
-          console.log('virhe: nimi on jo listassa')
-          window.alert(`${newName} is already added to phonebook`)
+          if (window.confirm(`${person.name} is already added to phonebook,  replace old number with a new one?`)) {
+            const id = persons.filter(p => p.name === person.name)[0].id
+            personService.update({id: id, ...person}).then(updatedPerson => {
+              setPersons(persons.map(person => person.id !== id ? person : updatedPerson))
+            })
+            setNewName('')
+            setnewNumber('')
+          }
         }
       }
 

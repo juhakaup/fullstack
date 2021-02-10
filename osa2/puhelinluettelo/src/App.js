@@ -34,7 +34,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>add new</h2>
-      <PersonForm persons={persons} setPersons={setPersons}/>
+      <PersonForm persons={persons} setPersons={setPersons} />
       <h2>Numbers</h2>
       <Persons filteredPersons={filteredPersons} removePerson={removePerson}/>
     </div>
