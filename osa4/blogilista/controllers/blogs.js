@@ -9,14 +9,15 @@ blogsRouter.get('/', (request, response) => {
     })
 })
 
-blogsRouter.post('/', (request, response) => {
-  const blog = new Blog(request.body)
+blogsRouter.post('/', (request, response, next) => {
+  const likes = request.body.likes===undefined ? 0 : request.body.likes
+  const blog = new Blog({ likes, ...request.body })
 
   blog
     .save()
     .then(result => {
       response.status(201).json(result)
-    })
+    }).catch(error => next(error))
 })
 
 module.exports = blogsRouter
