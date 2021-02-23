@@ -76,6 +76,22 @@ test('adding new blog without proper fields leads to error', async () => {
     .expect(400)
 })
 
+test('deleting a note', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect (blogsAtEnd).toHaveLength(helper.initialBlogs - 1)
+
+  const ids = blogsAtEnd.map(r => r.id)
+  expect (ids).not.toContain(blogToDelete.id)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
