@@ -4,6 +4,7 @@ let token = null
 
 const setToken = newToken => {
   token = `bearer ${newToken}`
+  // console.log(token)
 }
 
 const getAll = () => {
@@ -20,8 +21,21 @@ const response = await axios.post(baseUrl, newBlog, config)
 return response.data
 }
 
+const update = async blog => {
+      const updatedBlog = {
+      user: blog.user.id,
+      author: blog.author,
+      likes: blog.likes + 1,
+      title: blog.title,
+      url: blog.url
+    }
+  const response = await axios.put(`${baseUrl}/${blog.id}`, updatedBlog)
+  return response.data
+}
+
 export default { 
   getAll,
   create,
+  update,
   setToken,
 }

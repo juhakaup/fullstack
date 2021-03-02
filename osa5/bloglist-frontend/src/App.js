@@ -7,6 +7,7 @@ import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Error from './components/Error'
 import Togglable from './components/Togglable'
+import { getByPlaceholderText } from '@testing-library/react'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -72,15 +73,29 @@ const App = () => {
     setTimeout(() => {setNotification(null)}, 5000) 
   }
 
+  const handleLike = async (blog) => {
+    const likes = blog.likes + 1
+    const updatedBlog = {likes: likes, ...blog}
+    const newBlog = await blogService.update(updatedBlog)
+    const newBlogs = ( blogs.map(b => {
+      if (b.id === newBlog.id) {
+        return({...b, likes: newBlog.likes})
+      } else {
+        return b
+      }
+    }))
+    setBlogs(newBlogs)
+  }
+
   const blogList = () => (
     <div>
       <h2>blogs</h2>
       <p>{user.name} logged in <button onClick={logout}>logout</button></p>
-      <Togglable buttonLabel='new blog' ref={blogFormRef} >
+      <Togglable buttonLabel='new blog' closeLabel='cancel' ref={blogFormRef} >
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog blog={blog} handleLike={handleLike} />
         )}
     </div>
   )
