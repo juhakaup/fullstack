@@ -4,7 +4,6 @@ let token = null
 
 const setToken = newToken => {
   token = `bearer ${newToken}`
-  // console.log(token)
 }
 
 const getAll = () => {
@@ -33,9 +32,14 @@ const update = async blog => {
   return response.data
 }
 
+const remove = async id => {
+  axios.delete(`${baseUrl}/${id}`)
+}
+
 export default { 
   getAll,
   create,
   update,
+  remove,
   setToken,
 }

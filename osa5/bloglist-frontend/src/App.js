@@ -7,7 +7,6 @@ import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Error from './components/Error'
 import Togglable from './components/Togglable'
-import { getByPlaceholderText } from '@testing-library/react'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -19,8 +18,12 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      blogs.sort(function(a,b) {
+        return b.likes - a.likes
+      })
       setBlogs( blogs )
+    }
     )  
   }, [])
 
@@ -84,7 +87,21 @@ const App = () => {
         return b
       }
     }))
+    newBlogs.sort(function(a,b) {
+      return b.likes - a.likes
+    })
     setBlogs(newBlogs)
+  }
+
+  const deleteBlog = (blog) => {
+    if (window.confirm(`Delete${blog.title}`)) {
+      blogService.remove(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+      setNotification(`${blog.title} removed`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    }
   }
 
   const blogList = () => (
@@ -95,7 +112,7 @@ const App = () => {
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog blog={blog} handleLike={handleLike} />
+        <Blog blog={blog} handleLike={handleLike} user={user} deleteBlog={deleteBlog}/>
         )}
     </div>
   )
