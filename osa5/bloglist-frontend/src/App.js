@@ -24,7 +24,7 @@ const App = () => {
       })
       setBlogs( blogs )
     }
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password
@@ -71,18 +71,18 @@ const App = () => {
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
       })
-    
+
     setNotification(`a new blog ${blogObject.title} was added`)
-    setTimeout(() => {setNotification(null)}, 5000) 
+    setTimeout(() => {setNotification(null)}, 5000)
   }
 
   const handleLike = async (blog) => {
     const likes = blog.likes + 1
-    const updatedBlog = {likes: likes, ...blog}
+    const updatedBlog = { ...blog, likes: likes }
     const newBlog = await blogService.update(updatedBlog)
     const newBlogs = ( blogs.map(b => {
       if (b.id === newBlog.id) {
-        return({...b, likes: newBlog.likes})
+        return({ ...b, likes: newBlog.likes })
       } else {
         return b
       }
@@ -94,7 +94,7 @@ const App = () => {
   }
 
   const deleteBlog = (blog) => {
-    if (window.confirm(`Delete${blog.title}`)) {
+    if (window.confirm(`Delete ${blog.title}`)) {
       blogService.remove(blog.id)
       setBlogs(blogs.filter(b => b.id !== blog.id))
       setNotification(`${blog.title} removed`)
@@ -112,8 +112,8 @@ const App = () => {
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
       {blogs.map(blog =>
-        <Blog blog={blog} handleLike={handleLike} user={user} deleteBlog={deleteBlog}/>
-        )}
+        <Blog key={blog.id} blog={blog} handleLike={handleLike} user={user} deleteBlog={deleteBlog}/>
+      )}
     </div>
   )
 
@@ -122,8 +122,8 @@ const App = () => {
       <Notification message={notification} />
       <Error message={errorMessage} />
       {user === null
-      ? <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
-      : blogList()
+        ? <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
+        : blogList()
       }
     </div>
   )

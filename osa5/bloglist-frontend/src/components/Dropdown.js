@@ -1,10 +1,11 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Dropdown = (props) => {
   const [visible, setVisible] = useState(false)
   const [label, setLabel] = useState('view')
 
-  const showWhenVisible = { display: visible ? '' : 'none'}
+  const showWhenVisible = { display: visible ? '' : 'none' }
 
   const toggleVisibility = () => {
     setVisible(!visible)
@@ -20,6 +21,10 @@ const Dropdown = (props) => {
     </div>
   )
 
+}
+
+Dropdown.propTypes = {
+  title: PropTypes.string.isRequired
 }
 
 export default Dropdown
