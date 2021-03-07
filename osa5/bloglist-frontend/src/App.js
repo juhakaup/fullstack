@@ -19,9 +19,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
-      blogs.sort(function(a,b) {
-        return b.likes - a.likes
-      })
+      blogs.sort(function(a,b) {return b.likes - a.likes})
       setBlogs( blogs )
     }
     )
@@ -43,6 +41,7 @@ const App = () => {
         username, password
       })
 
+      window.localStorage.clear()
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
@@ -64,13 +63,12 @@ const App = () => {
     setUser(null)
   }
 
-  const createNewBlog = (blogObject) => {
+  const createNewBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-      })
+    await blogService.create(blogObject)
+    const blogs = await blogService.getAll()
+    blogs.sort(function(a,b) {return b.likes - a.likes})
+    setBlogs(blogs)
 
     setNotification(`a new blog ${blogObject.title} was added`)
     setTimeout(() => {setNotification(null)}, 5000)

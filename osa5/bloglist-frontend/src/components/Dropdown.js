@@ -14,7 +14,7 @@ const Dropdown = (props) => {
 
   return (
     <div>
-      {props.title }<button onClick={toggleVisibility}>{label}</button>
+      {props.title }<button id="view-button" onClick={toggleVisibility}>{label}</button>
       <div className='dropdown' style={showWhenVisible}>
         {props.children}
       </div>

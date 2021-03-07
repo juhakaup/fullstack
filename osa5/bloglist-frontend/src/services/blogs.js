@@ -8,7 +8,8 @@ const setToken = newToken => {
 
 const getAll = () => {
   const request = axios.get(baseUrl)
-  return request.then(response => response.data)
+  const blogs = request.then(response => response.data)
+  return blogs
 }
 
 const create = async newBlog => {
@@ -24,7 +25,7 @@ const update = async blog => {
   const updatedBlog = {
     user: blog.user.id,
     author: blog.author,
-    likes: blog.likes + 1,
+    likes: blog.likes,
     title: blog.title,
     url: blog.url
   }

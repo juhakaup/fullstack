@@ -10,10 +10,10 @@ const Blog = ({ blog, handleLike, user, deleteBlog }) => {
     marginBottom: 5
   }
 
-const DeleteBlog = (id) => {
+const DeleteBlog = () => {
   if (blog.user.username === user.username) {
     return (
-      <button onClick={() => deleteBlog(blog)}>delete</button>
+      <button id="delete-button" onClick={() => deleteBlog(blog)}>delete</button>
       )
   } else {
     return ('')
@@ -23,8 +23,8 @@ const DeleteBlog = (id) => {
   <div style={blogStyle}>
     <Dropdown title={blog.title.concat(" ", blog.author, " ")}>
       <div>{blog.url}</div>
-      <div>likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button></div>
-      <div>{blog.user.username}</div>
+      <div>likes {blog.likes} <button id="like-button" onClick={() => handleLike(blog)}>like</button></div>
+      <div>{blog.user.name}</div>
       <div><DeleteBlog /></div>
     </Dropdown>
   </div>
