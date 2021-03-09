@@ -7,7 +7,7 @@ const AnecdoteList = () => {
   const anecdotes = useSelector(state => state)
 
   return (
-    <ul>
+    <>
       {anecdotes.map(anecdote =>
         <div key={anecdote.id}>
           <div>
@@ -19,7 +19,7 @@ const AnecdoteList = () => {
           </div>
         </div>
       )}
-    </ul>
+    </>
   )
 }
 
