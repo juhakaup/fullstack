@@ -1,46 +1,25 @@
-const anecdotesAtStart = []
-//   'If it hurts, do it more often',
-//   'Adding manpower to a late software project makes it later!',
-//   'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-//   'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-//   'Premature optimization is the root of all evil.',
-//   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-// ]
+import anecdoteService from '../services/anecdotes'
 
-const getId = () => (100000 * Math.random()).toFixed(0)
-
-const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
-
-const initialState = anecdotesAtStart.map(asObject)
-
+const initialState = []
 const reducer = (state = initialState, action) => {
-  if (action.type === 'INCREMENT') {
-    const id = action.data.id
-    const anecdote = state.find(a => a.id === id)
-    const updatedAnecdote = {
-      ...anecdote, votes: anecdote.votes + 1
-    }
-    const newAnecdotes = state.map(anec => 
-      anec.id !== id ? anec : updatedAnecdote)
-    newAnecdotes.sort(function(a,b) {return b.votes - a.votes})
-    return newAnecdotes  
-  } else if (action.type === 'NEW') {
-    const newAnecdote = {
-      content: action.data.content,
-      id: getId(),
-      votes: 0
-    }
-    return state.concat(newAnecdote)
-  } else if (action.type === 'INIT') {
-    return action.data
+  switch(action.type) {
+    case 'NEW':
+      console.log(action.data)
+      return [...state, action.data]
+    case 'INCREMENT':
+      const id = action.data.id
+      const anecdote = state.find(a => a.id === id)
+      const updatedAnecdote = {
+        ...anecdote, votes: anecdote.votes + 1
+      }
+      const newAnecdotes = state.map(anec => 
+        anec.id !== id ? anec : updatedAnecdote)
+      newAnecdotes.sort(function(a,b) {return b.votes - a.votes})
+      return newAnecdotes
+    case 'INIT':
+      return action.data
+    default: return state
   }
-  return state
 }
 
 export const incrementVotesOf = (id) => {
@@ -50,17 +29,23 @@ export const incrementVotesOf = (id) => {
   }
 }
 
-export const addNewAnecdote = (data) => {
-  return {
-    type: 'NEW',
-    data,
+export const addNewAnecdote = (content) => {
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.createNew(content)
+    dispatch({
+      type: 'NEW',
+      data: newAnecdote
+    })
   }
 }
 
-export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: 'INIT',
-    data: anecdotes
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch({
+      type: 'INIT',
+      data: anecdotes,
+    })
   }
 }
 
