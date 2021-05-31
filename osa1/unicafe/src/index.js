@@ -14,12 +14,16 @@ const Statistics = ( {good, neutral, bad} ) => {
   if (sum > 0) {
   return (
     <>
+    <table>
+      <tbody>
       <StatisticLine text='good' value={good} />
       <StatisticLine text='neutral' value={neutral} />
       <StatisticLine text='bad' value={bad} />
       <StatisticLine text='all' value={sum} />
       <StatisticLine text='average' value={(good-bad)/sum} />
       <StatisticLine text='positive' value={good/sum*100} sign='%'/> 
+      </tbody>
+    </table>
     </>
   )
   } return ('No feedback given')
