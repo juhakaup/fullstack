@@ -18,6 +18,9 @@ blogsRouter.post('/', async (request, response, next) => {
   }
   const user = await User.findById(decodedToken.id)
 
+  if (!user) {
+    return response.status(401).json({ error: 'user undefined' })
+  }
   const likes = body.likes===undefined ? 0 : body.likes
 
   const blog = new Blog({
