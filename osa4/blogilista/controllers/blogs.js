@@ -39,6 +39,21 @@ blogsRouter.post('/', async (request, response, next) => {
 })
 
 blogsRouter.delete('/:id', async (request, response, next) => {
+  if (!request.token.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(404).json({ error: 'blog undefined' })
+  }
+  const blogUser = blog.user
+  const reqUser = request.user
+  if (!blogUser || !reqUser) {
+    return response.status(400).json({ error: 'user undefined' })
+  }
+  if (blogUser.toString() !== reqUser._id.toString()) {
+    return response.status(401).json({ error: 'Authorization error' })
+  }
   try {
     await Blog.findByIdAndRemove(request.params.id)
     response.status(204).end
