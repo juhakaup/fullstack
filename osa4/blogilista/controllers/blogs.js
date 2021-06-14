@@ -1,15 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('./../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
-
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
-  }
-  return null
-}
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -20,13 +10,13 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
-  const token = getTokenFrom(request)
-  const decodedToken = jwt.verify(token, process.env.SECRET)
-  if (!token || !decodedToken.id) {
+  if (!request.token.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
-  const user = await User.findById(decodedToken.id)
 
+  if (!request.user) {
+    return response.status(401).json({ error: 'user undefined' })
+  }
   const likes = body.likes===undefined ? 0 : body.likes
 
   const blog = new Blog({
@@ -34,13 +24,13 @@ blogsRouter.post('/', async (request, response, next) => {
     author: body.author,
     url: body.url,
     likes,
-    user: user._id
+    user: request.user._id
   })
 
   try{
     const savedBlog = await blog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
+    request.user.blogs = request.user.blogs.concat(savedBlog._id)
+    await request.user.save()
 
     response.json(savedBlog.toJSON())
   } catch(exception) {
@@ -49,6 +39,21 @@ blogsRouter.post('/', async (request, response, next) => {
 })
 
 blogsRouter.delete('/:id', async (request, response, next) => {
+  if (!request.token.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(404).json({ error: 'blog undefined' })
+  }
+  const blogUser = blog.user
+  const reqUser = request.user
+  if (!blogUser || !reqUser) {
+    return response.status(400).json({ error: 'user undefined' })
+  }
+  if (blogUser.toString() !== reqUser._id.toString()) {
+    return response.status(401).json({ error: 'Authorization error' })
+  }
   try {
     await Blog.findByIdAndRemove(request.params.id)
     response.status(204).end
