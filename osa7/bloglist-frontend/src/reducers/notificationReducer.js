@@ -3,12 +3,19 @@ const reducer = (state=null, action) => {
   case 'NOTIFY':
     return {
       ...state,
-      notification: action.data.message
+      message: action.data.message,
+      style: 'notification'
+    }
+  case 'ERROR':
+    return {
+      ...state,
+      message: action.data.message,
+      style: 'error'
     }
   case 'CLEAR':
     return {
       ...state,
-      notification: null
+      message: null
     }
   default:
     return state
@@ -17,7 +24,7 @@ const reducer = (state=null, action) => {
 
 let timeoutId
 let timeout = 5
-export const setNotification = (message) => {
+export const setNotification = ( message, style ) => {
   if (timeoutId !== undefined) {
     clearTimeout(timeoutId)
   }
@@ -26,10 +33,19 @@ export const setNotification = (message) => {
       dispatch({ type: 'CLEAR' })
     }, timeout * 1000)
 
-    dispatch({
-      type: 'NOTIFY',
-      data: { message }
-    })
+    if (style === 'notification') {
+      dispatch({
+        type: 'NOTIFY',
+        data: { message }
+      })
+    } else if (style === 'error') {
+      dispatch({
+        type: 'ERROR',
+        data: { message }
+      })
+    } else {
+      console.log('undefined notification style')
+    }
   }
 }
 
