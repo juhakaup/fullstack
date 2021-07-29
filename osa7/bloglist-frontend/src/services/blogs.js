@@ -34,7 +34,18 @@ const update = async blog => {
 }
 
 const remove = async id => {
-  axios.delete(`${baseUrl}/${id}`)
+  const config = {
+    headers: { Authorization: token },
+  }
+  axios.delete(`${baseUrl}/${id}`, config)
+    .then(res => {
+      console.log(res)
+      return true
+    })
+    .catch(error => {
+      console.error('error deleting blog ', error)
+      return false
+    })
 }
 
 export default {

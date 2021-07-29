@@ -7,11 +7,10 @@ import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
-import { initBlogs, addNewblog } from './reducers/blogReducer'
+import { initBlogs, addNewblog, updateBlog, removeBlog } from './reducers/blogReducer'
 import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -22,13 +21,11 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs => {
       dispatch(initBlogs(blogs))
-      //blogs.sort(function(a,b) {return b.likes - a.likes})
-      //setBlogs( blogs )
     }
     )
   }, [dispatch])
 
-  const blogsi = useSelector(state => state.blogs)
+  const blogs = useSelector(state => state.blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -71,33 +68,24 @@ const App = () => {
     const newBlog = await blogService.create(blogObject)
     dispatch(addNewblog(newBlog))
     dispatch(setNotification(`a new blog ${blogObject.title} was added`, 'notification'))
-    //const blogs = await blogService.getAll()
-    //blogs.sort(function(a,b) {return b.likes - a.likes})
-    //setBlogs(blogs)
   }
 
   const handleLike = async (blog) => {
     const likes = blog.likes + 1
     const updatedBlog = { ...blog, likes: likes }
     const newBlog = await blogService.update(updatedBlog)
-    const newBlogs = ( blogs.map(b => {
-      if (b.id === newBlog.id) {
-        return({ ...b, likes: newBlog.likes })
-      } else {
-        return b
-      }
-    }))
-    newBlogs.sort(function(a,b) {
-      return b.likes - a.likes
-    })
-    setBlogs(newBlogs)
+    dispatch(updateBlog(newBlog))
   }
 
   const deleteBlog = (blog) => {
+    console.log(blog)
     if (window.confirm(`Delete ${blog.title}`)) {
-      blogService.remove(blog.id)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
-      dispatch(setNotification(`${blog.title} removed`, 'notification'))
+      if (blogService.remove(blog.id)) {
+        dispatch(removeBlog(blog))
+        dispatch(setNotification(`${blog.title} removed`, 'notification'))
+      } else {
+        dispatch(setNotification('error removing blog', 'error'))
+      }
     }
   }
 
@@ -108,7 +96,7 @@ const App = () => {
       <Togglable buttonLabel='new blog' closeLabel='cancel' ref={blogFormRef} >
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
-      {blogsi.map(blog =>
+      {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} handleLike={handleLike} user={user} deleteBlog={deleteBlog}/>
       )}
     </div>
