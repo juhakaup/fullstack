@@ -5,29 +5,30 @@ import loginService from './services/login'
 import LoginForm from './components/Loginform'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
-import Error from './components/Error'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+import { initBlogs, addNewblog } from './reducers/blogReducer'
+import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-  //const [notification, setNotification] = useState(null)
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
-      blogs.sort(function(a,b) {return b.likes - a.likes})
-      setBlogs( blogs )
+      dispatch(initBlogs(blogs))
+      //blogs.sort(function(a,b) {return b.likes - a.likes})
+      //setBlogs( blogs )
     }
     )
-  }, [])
+  }, [dispatch])
+
+  const blogsi = useSelector(state => state.blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -54,14 +55,9 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      //store.dispatch({ type: 'NOTIFY', data: { message:`${user.name} logged in succesfully` } })
-      //store.dispatch(setNotification('heippa'))
-      dispatch(setNotification(`${user.name} logged in succesfully`))
-      //setNotification(`${user.name} logged in succesfully`)
-      //setTimeout(() => {setNotification(null)}, 5000)
+      dispatch(setNotification(`${user.name} logged in succesfully`, 'notification'))
     } catch (exception) {
-      setErrorMessage('wrong username or password')
-      setTimeout(() => {setErrorMessage(null)}, 5000)
+      dispatch(setNotification('wrong username or password', 'error'))
     }
   }
 
@@ -72,13 +68,12 @@ const App = () => {
 
   const createNewBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
-    await blogService.create(blogObject)
-    const blogs = await blogService.getAll()
-    blogs.sort(function(a,b) {return b.likes - a.likes})
-    setBlogs(blogs)
-
-    dispatch(setNotification(`a new blog ${blogObject.title} was added`))
-    //setTimeout(() => {setNotification(null)}, 5000)
+    const newBlog = await blogService.create(blogObject)
+    dispatch(addNewblog(newBlog))
+    dispatch(setNotification(`a new blog ${blogObject.title} was added`, 'notification'))
+    //const blogs = await blogService.getAll()
+    //blogs.sort(function(a,b) {return b.likes - a.likes})
+    //setBlogs(blogs)
   }
 
   const handleLike = async (blog) => {
@@ -102,10 +97,7 @@ const App = () => {
     if (window.confirm(`Delete ${blog.title}`)) {
       blogService.remove(blog.id)
       setBlogs(blogs.filter(b => b.id !== blog.id))
-      setNotification(`${blog.title} removed`)
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification(`${blog.title} removed`, 'notification'))
     }
   }
 
@@ -116,7 +108,7 @@ const App = () => {
       <Togglable buttonLabel='new blog' closeLabel='cancel' ref={blogFormRef} >
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
-      {blogs.map(blog =>
+      {blogsi.map(blog =>
         <Blog key={blog.id} blog={blog} handleLike={handleLike} user={user} deleteBlog={deleteBlog}/>
       )}
     </div>
@@ -124,8 +116,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={'notification'} />
-      <Error message={errorMessage} />
+      <Notification />
       {user === null
         ? <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
         : blogList()
