@@ -8,12 +8,12 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
 import { initBlogs, addNewblog, updateBlog, removeBlog } from './reducers/blogReducer'
+import { storeUser, removeUser } from './reducers/userReducer'
 import { useDispatch, useSelector } from 'react-redux'
 
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
@@ -26,14 +26,15 @@ const App = () => {
   }, [dispatch])
 
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(storeUser(user))
     }
-  }, [])
+  }, [dispatch])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -47,9 +48,8 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
+      dispatch(storeUser(user))
       blogService.setToken(user.token)
-
-      setUser(user)
       setUsername('')
       setPassword('')
       dispatch(setNotification(`${user.name} logged in succesfully`, 'notification'))
@@ -60,7 +60,7 @@ const App = () => {
 
   const logout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(removeUser)
   }
 
   const createNewBlog = async (blogObject) => {

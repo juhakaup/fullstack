@@ -14,9 +14,6 @@ const blogReducer = (state = [], action) => {
         return b
       }
     }))
-    //newBlogs.sort(function(a,b) {
-    //  return b.likes - a.likes
-    //})
     return sortByLikes(newBlogs)
   }
   case 'REMOVE': {
