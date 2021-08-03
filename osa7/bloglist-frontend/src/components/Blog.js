@@ -21,7 +21,7 @@ const Blog = ({ blog, handleLike, user, deleteBlog }) => {
   }
   return (
     <div style={blogStyle}>
-      <Dropdown title={blog.title.concat(" ", blog.author, " ")}>
+      <Dropdown title={blog.title.concat(' ', blog.author, ' ')}>
         <div>{blog.url}</div>
         <div>likes {blog.likes} <button id="like-button" onClick={() => handleLike(blog)}>like</button></div>
         <div>{blog.user.name}</div>
