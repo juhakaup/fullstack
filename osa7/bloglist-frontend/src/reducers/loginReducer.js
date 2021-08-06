@@ -1,24 +1,24 @@
 const loginReducer = (state=null, action) => {
   switch (action.type) {
-  case 'SETUSER':
-    return action.data
-  case 'REMOVEUSER':
+  case 'REMOVE_USER':
     return null
+  case 'SET_USER':
+    return action.data
   default:
     return state
   }
 }
 
-export const storeUser = (user) => {
+export const loginUser = (user) => {
   return {
-    type: 'SETUSER',
+    type: 'SET_USER',
     data: user
   }
 }
 
-export const removeUser = () => {
+export const logoutUser = () => {
   return {
-    type: 'REMOVEUSER'
+    type: 'REMOVE_USER'
   }
 }
 
