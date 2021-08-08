@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/users'
@@ -11,7 +10,9 @@ import { setNotification } from './reducers/notificationReducer'
 import { initBlogs, addNewblog, updateBlog, removeBlog } from './reducers/blogReducer'
 import { loginUser, logoutUser } from './reducers/loginReducer'
 import { useDispatch, useSelector } from 'react-redux'
-import { Switch, Route, Link, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, Link, useRouteMatch, Redirect, useHistory } from 'react-router-dom'
+import { Table, Navbar, Container, Nav } from 'react-bootstrap'
+import { LinkContainer } from 'react-router-bootstrap'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -20,7 +21,7 @@ const App = () => {
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
-
+  const history = useHistory()
   const blogs = useSelector(state => state.blogs)
   const user = useSelector(state => state.user)
 
@@ -71,6 +72,7 @@ const App = () => {
   const logout = () => {
     dispatch(logoutUser())
     window.localStorage.removeItem('loggedBlogappUser')
+    history.push('/login')
     console.log(user)
   }
 
@@ -132,21 +134,31 @@ const App = () => {
 
   const BlogList = () => (
     <div>
+      <h2>Blogs</h2>
+      <hr/>
       <Togglable buttonLabel='new blog' closeLabel='cancel' ref={blogFormRef} >
         <BlogForm createNewBlog={createNewBlog} />
       </Togglable>
-      {blogs.map(blog =>
-        <li key={blog.id}>
-          <Link style={padding} to={`/blogs/${blog.id}`}>{ blog.title }</Link>
-        </li>
-      )}
+      <hr/>
+      <Table striped>
+        <tbody>
+          {blogs.map(blog =>
+            <tr key={blog.id}>
+              <td>
+                <Link style={padding} to={`/blogs/${blog.id}`}>{ blog.title }</Link>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
     </div>
   )
 
   const Users = () => (
     <div>
       <h2>Users</h2>
-      <table>
+      <hr/>
+      <Table striped>
         <tbody>
           <tr>
             <td></td>
@@ -163,7 +175,7 @@ const App = () => {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
 
@@ -189,31 +201,43 @@ const App = () => {
   const userMatch = useRouteMatch('/users/:id')
   const blogMatch = useRouteMatch('/blogs/:id')
 
-  if (user === null) {
-    return (
-      <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
-    )
-  }
   return (
-    <div>
+    <div className="container">
       <div>
+        <Navbar bg="dark" variant="light" expand="sm">
+          <Container className="justify-content-start">
+            <Navbar.Brand className="text-light">Bloglist app</Navbar.Brand>
+            <LinkContainer to="/users">
+              <Nav.Link><span className="text-info">users</span></Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/">
+              <Nav.Link><span className="text-info">blogs</span></Nav.Link>
+            </LinkContainer>
+            {user
+              ? <span className="text-muted">{user.name} logged in <button className="btn btn-sm btn-secondary" onClick={logout}>logout</button></span>
+              : <LinkContainer to="/login"><Nav.Link>login</Nav.Link></LinkContainer>}
+          </Container>
+        </Navbar>
         <Notification />
-        <Link style={padding} to="/">blogs</Link>
-        <Link style={padding} to="/users">users</Link>
-        {user.name} logged in <button onClick={logout}>logout</button>
       </div>
       <Switch>
         <Route path="/users/:id">
-          <UserInfo />
+          {user ?  <UserInfo /> : <Redirect to="/login" />}
         </Route>
         <Route path="/blogs/:id">
-          <BlogInfo />
+          {user ?  <BlogInfo /> : <Redirect to="/login" />}
         </Route>
         <Route path="/users">
-          <Users />
+          {user ?  <Users /> : <Redirect to="/login" />}
+        </Route>
+        <Route path="/login">
+          {user
+            ? <Redirect to="/" />
+            : <LoginForm handleLogin={handleLogin} setUsername={setUsername} setPassword={setPassword} />
+          }
         </Route>
         <Route path="/">
-          <BlogList />
+          {user ?  <BlogList /> : <Redirect to="/login" />}
         </Route>
       </Switch>
     </div>
