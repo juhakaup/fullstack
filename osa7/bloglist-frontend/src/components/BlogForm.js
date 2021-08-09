@@ -46,7 +46,7 @@ const BlogForm = ({ createNewBlog }) => {
           />
         </Form.Group>
         <Form.Group>
-          <Button className="btn btn-success" variant="primary" type="submit">
+          <Button id="create-button" className="btn btn-success" variant="primary" type="submit">
           create
           </Button>
         </Form.Group>

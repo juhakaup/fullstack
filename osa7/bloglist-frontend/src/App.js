@@ -95,6 +95,7 @@ const App = () => {
       if (blogService.remove(blog.id)) {
         dispatch(removeBlog(blog))
         dispatch(setNotification(`${blog.title} removed`, 'notification'))
+        history.push('/')
       } else {
         dispatch(setNotification('error removing blog', 'error'))
       }
@@ -114,7 +115,7 @@ const App = () => {
       <div>
         <h2>{blog.title}</h2>
         <a href={blog.url}>{blog.url}</a>
-        <div>{blog.likes} likes <button id="like-button" onClick={() => handleLike(blog)}>like</button></div>
+        <div>{blog.likes} likes <button className="btn btn-sm btn-success" id="like-button" onClick={() => handleLike(blog)}>like</button></div>
         <div>added by {blog.user.name}</div>
         <DeleteBlog blog={blog} />
       </div>
@@ -125,7 +126,7 @@ const App = () => {
     if(!blog || !user) return ('')
     if (blog.user.username === user.username) {
       return (
-        <button id="delete-button" onClick={() => deleteBlog(blog)}>delete</button>
+        <button className="btn btn-sm btn-danger" id="delete-button" onClick={() => deleteBlog(blog)}>delete</button>
       )
     } else {
       return ('')
@@ -204,6 +205,7 @@ const App = () => {
   return (
     <div className="container">
       <div>
+        <Notification />
         <Navbar bg="dark" variant="light" expand="sm">
           <Container className="justify-content-start">
             <Navbar.Brand className="text-light">Bloglist app</Navbar.Brand>
@@ -218,7 +220,6 @@ const App = () => {
               : <LinkContainer to="/login"><Nav.Link>login</Nav.Link></LinkContainer>}
           </Container>
         </Navbar>
-        <Notification />
       </div>
       <Switch>
         <Route path="/users/:id">

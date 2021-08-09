@@ -9,17 +9,17 @@ const LoginForm = ({ handleLogin, setUsername, setPassword }) => (
         <Form.Label>username:</Form.Label>
         <Form.Control
           type="text"
-          name="username"
+          name="Username"
           onChange={({ target }) => setUsername(target.value)}
         />
         <Form.Label>password:</Form.Label>
         <Form.Control
           type="password"
-          name="password"
+          name="Password"
           onChange={({ target }) => setPassword(target.value)}
         />
       </Form.Group>
-      <Button className="btn-lg btn-info" variant="primary" type="submit">
+      <Button id="login-button" className="btn-lg btn-info" variant="primary" type="submit">
         login
       </Button>
     </Form>
