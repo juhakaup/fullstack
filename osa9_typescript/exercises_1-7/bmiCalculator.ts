@@ -15,6 +15,8 @@ const parseBMIArguments = (args: string[]): BMIValues => {
       "height": height,
       "weight": weight
     };
+  } else {
+    throw new Error('Invalid arguments!')
   }
 }
 
@@ -41,3 +43,5 @@ try {
   }
   console.log(errorMessage);
 }
+
+export { calculateBmi };
