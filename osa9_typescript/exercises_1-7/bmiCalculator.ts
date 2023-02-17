@@ -4,8 +4,8 @@ interface BMIValues {
 }
 
 const parseBMIArguments = (args: string[]): BMIValues => {
-  if (args.length > 4) throw new Error('Too many arguments!')
-  if (args.length < 4) throw new Error('Not enough arguments!')
+  if (args.length > 4) throw new Error('Too many arguments!');
+  if (args.length < 4) throw new Error('Not enough arguments!');
 
   const height = Number(args[2]);
   const weight = Number(args[3]);
@@ -16,9 +16,9 @@ const parseBMIArguments = (args: string[]): BMIValues => {
       "weight": weight
     };
   } else {
-    throw new Error('Invalid arguments!')
+    throw new Error('Invalid arguments!');
   }
-}
+};
 
 const calculateBmi = (height: number, weight: number) => {
   const bmi = weight / ((height/100) * (height/100));
@@ -30,7 +30,7 @@ const calculateBmi = (height: number, weight: number) => {
   if (bmi >= 16.9) return 'Underweight (Mild thinness)';
   if (bmi >= 16) return 'Underweight (Moderate thinness)';
   return 'Underweight (Severe thinness)';
-}
+};
 
 
 try {

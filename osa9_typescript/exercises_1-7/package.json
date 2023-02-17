@@ -8,7 +8,8 @@
     "ts-node": "ts-node",
     "calculateBMI": "ts-node bmiCalculator.ts",
     "calculateExercises": "ts-node exerciseCalculator.ts",
-    "dev": "ts-node-dev index.ts"
+    "dev": "ts-node-dev index.ts",
+    "lint": "eslint --ext .ts ."
   },
   "author": "Juha Kauppinen",
   "license": "ISC",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
     "ts-node-dev": "^2.0.0"
   }
 }
