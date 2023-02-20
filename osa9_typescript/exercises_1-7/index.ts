@@ -30,7 +30,7 @@ app.post('/exercises', (req, res) => {
   const { daily_exercises, target } = req.body;
 
   if (daily_exercises === undefined || target === undefined) { return res.json({ error: "parameters missing"}); }
-  if (isNaN(target) || !Array.isArray(daily_exercises)) { return res.json({ error: "malformatted parameters"}); }
+  if (isNaN(Number(target)) || !Array.isArray(daily_exercises)) { return res.json({ error: "malformatted parameters"}); }
 
   const results = calculateExercises(Number(target), daily_exercises as number[]);
 

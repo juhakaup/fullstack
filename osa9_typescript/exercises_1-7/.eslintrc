@@ -1,7 +1,7 @@
 {
   "extends": [
     "eslint:recommended",
-    // "plugin:@typescript-eslint/recommended-requiring-type-checking", // does not work
+    "plugin:@typescript-eslint/recommended-requiring-type-checking", // does not work
     "plugin:@typescript-eslint/recommended"
   ],
   "plugins": ["@typescript-eslint"],
@@ -23,6 +23,7 @@
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "tsconfig.json",
+    "tsconfigRootDir": "exercises_1-7"
   }
 }
