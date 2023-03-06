@@ -5,6 +5,8 @@ export interface DiaryEntry {
     visibility: Visibility
 }
 
+export type newDiaryEntry = Omit<DiaryEntry, "id">;
+
 export enum Weather {
     Sunny = 'sunny',
     Rainy = 'rainy',
