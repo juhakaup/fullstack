@@ -5,6 +5,7 @@ import { useState } from "react";
 interface diaryFormProps {
     entries: DiaryEntry[];
     setEntries: React.Dispatch<React.SetStateAction<DiaryEntry[]>>;
+    errorMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const DiaryForm = (props: diaryFormProps) => {
@@ -12,9 +13,9 @@ const DiaryForm = (props: diaryFormProps) => {
     const [visibility, setVisibitily] = useState('');
     const [weather, setWeather] = useState('');
     const [comment, setComment] = useState('');
-    const {entries, setEntries} = props;
+    const {entries, setEntries, errorMessage} = props;
 
-    const submitForm = (event: React.SyntheticEvent) => {
+    const submitForm = async (event: React.SyntheticEvent) => {
         event.preventDefault();
         const diaryToAdd = {
             date: date,
@@ -22,14 +23,22 @@ const DiaryForm = (props: diaryFormProps) => {
             weather: weather as Weather,
             comment: comment
         }
-        addNewDiary(diaryToAdd)
-        .then(result => {
-            setEntries(entries.concat(result));
-            setDate('');
-            setVisibitily('');
-            setWeather('');
-            setComment('');
-        })
+        try {
+            const result = await addNewDiary(diaryToAdd)
+            if (result) {
+                setEntries(entries.concat(result));
+                setDate('');
+                setVisibitily('');
+                setWeather('');
+                setComment('');
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                // const message = "" + error;
+                errorMessage(error.toString());
+            }
+        }
+        
     }
 
     return (

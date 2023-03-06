@@ -6,6 +6,7 @@ import DiaryForm from "./diaryForm";
 
 function App() {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     getAllDiaries().then(data => {
@@ -13,9 +14,16 @@ function App() {
     })
   },[]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setErrorMessage('');
+    }, 5000)
+  }, [errorMessage])
+
   return (
     <div>
-      <DiaryForm entries={entries} setEntries={setEntries}/>
+      <p style={{color:"red"}}>{errorMessage}</p>
+      <DiaryForm entries={entries} setEntries={setEntries} errorMessage={setErrorMessage}/>
       <h2>Diaries:</h2>
         { entries.map(entry => (
           <Entry key={entry.id} entry={entry}/>

@@ -10,6 +10,12 @@ export const getAllDiaries = () => {
 }
 
 export const addNewDiary = async (newEntry: newDiaryEntry) => {
-    return axios.post<DiaryEntry>(baseUrl, newEntry)
-        .then(response => response.data)
+    try {
+        const response = await axios.post<DiaryEntry>(baseUrl, newEntry)
+        return response.data
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data);
+        }
+    }
 }
