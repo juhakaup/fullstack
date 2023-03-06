@@ -34,23 +34,51 @@ const DiaryForm = (props: diaryFormProps) => {
             }
         } catch (error) {
             if (error instanceof Error) {
-                // const message = "" + error;
                 errorMessage(error.toString());
             }
         }
-        
     }
 
     return (
         <div>
           <h2>Add new entry:</h2>
             <form onSubmit={submitForm}>
-                <label>Date:</label><br />
-                <input id='date' value={date} onChange={(event) => setDate(event.target.value)} /><br />
-                <label>Visibility:</label><br />
-                <input id="visibility" value={visibility} onChange={(event) => setVisibitily(event.target.value)} /><br />
-                <label>Weather:</label><br />
-                <input id="weather" value={weather} onChange={(event) => setWeather(event.target.value)} /><br />
+                <label>Date:<br /> 
+                    <input type="date" name="date" id='date' onChange={(event) => setDate(event.target.value)}/>
+                </label><br /> 
+                <label>Visibility:<br />
+                <div>
+                    <input type="radio" name="visibility" value={Visibility.Great} onChange={(event) => setVisibitily(event.target.value)} />
+                    <label >{Visibility.Great}</label>
+
+                    <input type="radio" name="visibility" value={Visibility.Good} onChange={(event) => setVisibitily(event.target.value)} />
+                    <label >{Visibility.Good}</label>
+
+                    <input type="radio" name="visibility" value={Visibility.Ok} onChange={(event) => setVisibitily(event.target.value)} />
+                    <label >{Visibility.Ok}</label>
+
+                    <input type="radio" name="visibility" value={Visibility.Poor} onChange={(event) => setVisibitily(event.target.value)} />
+                    <label >{Visibility.Poor}</label>
+                    </div>
+                </label><br />
+                <label>Weather:
+                <div>
+                    <input type="radio" name="weather" value={Weather.Sunny} onChange={(event) => setWeather(event.target.value)} />
+                    <label >{Weather.Sunny} </label>
+
+                    <input type="radio" name="weather" value={Weather.Rainy} onChange={(event) => setWeather(event.target.value)} />
+                    <label >{Weather.Rainy}</label>
+
+                    <input type="radio" name="weather" value={Weather.Cloudy} onChange={(event) => setWeather(event.target.value)} />
+                    <label >{Weather.Cloudy}</label>
+
+                    <input type="radio" name="weather" value={Weather.Stormy} onChange={(event) => setWeather(event.target.value)} />
+                    <label >{Weather.Stormy}</label>
+
+                    <input type="radio" name="weather" value={Weather.Windy} onChange={(event) => setWeather(event.target.value)} />
+                    <label >{Weather.Windy}</label>
+                    </div> 
+                </label><br />
                 <label>Comment:</label><br />
                 <input id="comment" value={comment} onChange={(event) => setComment(event.target.value)} /><br />
                 <button type='submit'>Add Entry</button>
