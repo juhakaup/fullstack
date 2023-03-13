@@ -146,7 +146,7 @@ const isString = (str: unknown): str is string => {
 
 const parseDate = (dob: unknown): string => {
     if (!dob || !isString(dob) || !isDate(dob)) {
-        throw new Error('Incorrect or missing date of birth');
+        throw new Error('Incorrect or missing date');
     }
     return dob;
 };
