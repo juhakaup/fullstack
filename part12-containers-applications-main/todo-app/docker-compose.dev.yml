@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: ./todo-backend/dev.Dockerfile
     volumes:
-      - ./todo-backend:/usr/src/app/backend
+      - ./todo-backend:/usr/src/app
     environment:
       - PORT=3003
       - REDIS_URL=redis://redis:6379
@@ -36,7 +36,9 @@ services:
       context: .
       dockerfile: ./todo-frontend/dev.Dockerfile
     volumes:
-      - ./todo-frontend:/usr/src/app/fronend
+      - ./todo-frontend:/usr/src/app
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8080/api
     container_name: hello-frontend-dev
   
   nginx:
