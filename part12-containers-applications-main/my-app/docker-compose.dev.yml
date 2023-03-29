@@ -1,0 +1,48 @@
+services:
+
+  postgres-db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./db:/var/lib/postgresql/data
+  
+  backend:
+    image: cba-back-dev
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    environment:
+      - PORT=3001
+      - PGUSER=postgres
+      - PGHOST=postgres-db
+      - PGPASSWORD=postgres
+      - PGDATABASE=postgres
+      - PGPORT=5432
+    volumes:
+      - ./backend:/usr/src/app
+    depends_on:
+      - postgres-db
+
+  frontend:
+    image: cba-front-dev
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    environment:
+      - BACKEND_URL=http://localhost:8080/api
+    volumes:
+      - ./frontend:/usr/src/app
+
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: reverse-proxy
+    depends_on:
+      - backend
+      - frontend
