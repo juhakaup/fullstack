@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose"
+// @ts-ignore
 import uniqueValidator from "mongoose-unique-validator"
 
 export interface IAuthor {
