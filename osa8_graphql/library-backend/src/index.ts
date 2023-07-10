@@ -104,7 +104,7 @@ const resolvers = {
   },
   Author: {
     bookCount: async ( root ) => {
-      return (await (Book.find({ name: root.name }))).length;
+      return (await (Book.find({ author: root.id }))).length;
     },
   },
   Mutation: {
@@ -158,7 +158,7 @@ const resolvers = {
           }
         })
       }
-      
+
       const author = await Author.findOne({ name: args.name });
       if (!author) {
         return null
