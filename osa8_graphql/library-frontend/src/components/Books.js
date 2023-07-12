@@ -1,8 +1,19 @@
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS } from '../queries'
+import GenreSelector from './GenreSelector'
+import { useEffect, useState } from 'react'
 
 const Books = (props) => {
-  const result = useQuery(ALL_BOOKS, {skip: !props.show})
+  const [genre, setGenre] = useState(null)
+
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre },
+    skip: !props.show
+  })
+
+  useEffect(() => { 
+    result.refetch() 
+  }, [genre]) // eslint-disable-line
 
   if (!props.show) {
     return null
@@ -34,6 +45,7 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
+      <GenreSelector setGenre={setGenre} selectedGenre={genre}/>
     </div>
   )
 }
