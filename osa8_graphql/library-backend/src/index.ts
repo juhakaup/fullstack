@@ -24,6 +24,7 @@ const typeDefs = `
   type User {
     username: String!
     favoriteGenre: String!
+    recommended: [Book]
     id: ID!
   }
 
@@ -53,6 +54,8 @@ const typeDefs = `
     allAuthors: [Author!]!
     login(username: String, password: String): Token
     me: User
+    recommended: [Book]
+    allGenres: [String]!
   }
 
   type Mutation {
@@ -85,7 +88,9 @@ interface params {
 const resolvers = {
   Query: {
     bookCount: async () => (await Book.find({})).length,
+
     authorCount: async () => (await Author.find({})).length,
+
     allBooks: async (root, args) => {
       let params:params = {};
       if (args.author) {
@@ -97,16 +102,31 @@ const resolvers = {
       }
       return await Book.find(params).populate('author');
     },
+
     allAuthors: async () => Author.find({}),
-    me: (root, args, context) => {
+
+    me: async (root, args, context) => {
+      const usr = await User.findById(context.currentUser._id)
       return context.currentUser;
     },
+
+    allGenres:async () => {
+      return await Book.find({}).distinct('genres')
+    }
   },
+
   Author: {
     bookCount: async ( root ) => {
       return (await (Book.find({ author: root.id }))).length;
     },
   },
+
+  User: {
+    recommended: async ( root ) => {
+      return await Book.find({ genres: root.favoriteGenre }).populate('author');
+    }
+  },
+
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser;
@@ -148,6 +168,7 @@ const resolvers = {
       }
       return newBook
     },
+
     editAuthor: async (roor, args, context) => {
       const currentUser = context.currentUser;
 
@@ -167,6 +188,7 @@ const resolvers = {
       author.born = args.setBornTo;
       return author.save()
     },
+
     createUser:async (root, args) => {
       const user = new User({ 
         username: args.username,
@@ -184,6 +206,7 @@ const resolvers = {
           })
         })
     },
+
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
 
@@ -201,7 +224,6 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
     },
-
   },
 }
 
