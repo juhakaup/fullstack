@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import 'dotenv/config';
 import { GraphQLError } from "graphql";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 console.log('connecting to', MONGODB_URI);
 
@@ -95,7 +95,9 @@ const resolvers = {
       let params:params = {};
       if (args.author) {
         const author = await Author.findOne({ name: args.author });
-        params.author = author.id;
+        if (author) {
+          params.author = author.id;
+        }
       }
       if (args.genre) {
         params.genres = args.genre;
