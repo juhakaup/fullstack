@@ -13,6 +13,9 @@ import 'dotenv/config';
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
 
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/lib/use/ws')
+
 const MONGODB_URI = process.env.MONGODB_URI || "";
 
 console.log('connecting to', MONGODB_URI);
@@ -32,9 +35,28 @@ interface MyContext {
 const app = express();
 const httpServer = http.createServer(app);
 
+const wsServer = new WebSocketServer({
+  server: httpServer,
+  path: "/",
+})
+
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+const serverCleanup = useServer({ schema }, wsServer);
+
 const server = new ApolloServer({
-  schema: makeExecutableSchema({ typeDefs, resolvers }),
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  schema: schema,
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    {
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose();
+          }
+        }
+      }
+    }
+  ],
 });
 
 const start = async () => {

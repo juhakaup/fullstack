@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import Author from "./models/author";
 import Book from "./models/book";
 import User from "./models/user";
+import { PubSub } from "graphql-subscriptions"
+const pubSub = new PubSub();
 
 interface params {
     author?: string
@@ -92,6 +94,9 @@ const resolvers = {
             }
           })
         }
+
+        pubSub.publish("BOOK_ADDED", { bookAdded: newBook })
+
         return newBook
       },
   
@@ -149,6 +154,12 @@ const resolvers = {
         }
   
         return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
+      },
+    },
+
+    Subscription: {
+      bookAdded: {
+        subscribe: () => pubSub.asyncIterator("BOOK_ADDED")
       },
     },
   }
