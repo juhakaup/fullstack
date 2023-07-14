@@ -1,6 +1,12 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from '@apollo/server/standalone';
-import mongoose from "mongoose";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
+import { makeExecutableSchema } from "@graphql-tools/schema"
+import express from "express";
+import cors from "cors";
+import http from "http";
+
+import mongoose, { plugin } from "mongoose";
 import User from "./models/user";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
@@ -19,23 +25,40 @@ mongoose.connect(MONGODB_URI)
     console.log('error connection to MongoDB:', error.message)
   })
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-})
+interface MyContext {
+  currentUser?: typeof User;
+}
 
-startStandaloneServer(server, {
-  listen: { port: 4000 },
-  context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.startsWith('Bearer ')) {
-      const decodedToken = jwt.verify(
-        auth.substring(7), process.env.JWT_SECRET
-      )
-      const currentUser = await User.findById(decodedToken.id)
-      return { currentUser }
-    }
-  },
-}).then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+const app = express();
+const httpServer = http.createServer(app);
+
+const server = new ApolloServer({
+  schema: makeExecutableSchema({ typeDefs, resolvers }),
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+});
+
+const start = async () => {
+  await server.start();
+
+  app.use(
+    "/",
+    cors<cors.CorsRequest>(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req, res }) => {
+        const auth = req ? req.headers.authorization : null
+        let currentUser = null;
+        if (auth && auth.startsWith('Bearer ')) {
+          const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
+          currentUser = await User.findById(decodedToken.id)
+        }
+        return { currentUser }
+      }
+    }),
+  )
+};
+start();
+
+const PORT = 4000;
+   httpServer.listen(PORT, () => 
+   console.log(`server is running on http://localhost:${PORT}`));
