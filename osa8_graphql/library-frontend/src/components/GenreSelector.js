@@ -28,7 +28,7 @@ const GenreSelector = ({ setGenre, selectedGenre }) => {
     return (
         <div>
             {genres.map(genre => (
-                <button style={(selectedGenre === genre) ? selectedStyle : unselectedStyle} onClick={() => setGenre(genre)}>{genre}</button>
+                <button key={genre} style={(selectedGenre === genre) ? selectedStyle : unselectedStyle} onClick={() => setGenre(genre)}>{genre}</button>
             ))}
             <button style={unselectedStyle} onClick={() => setGenre(null)}>all genres</button>
         </div>
