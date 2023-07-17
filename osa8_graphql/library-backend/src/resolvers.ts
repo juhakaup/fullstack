@@ -45,7 +45,7 @@ const resolvers = {
   
     Author: {
       bookCount: async ( root ) => {
-        return (await (Book.find({ author: root.id }))).length;
+        return root.books.length;
       },
     },
   
@@ -82,6 +82,7 @@ const resolvers = {
             })
           }
         }
+
         const newBook = new Book({ ...args, author: author })
         try {
           await newBook.save();
@@ -93,6 +94,22 @@ const resolvers = {
               error
             }
           })
+        }
+
+        author = await Author.findById(author)
+        if (author) {
+          author.books.push(newBook.id)
+          try {
+              await author.save()
+          } catch (error) {
+            throw new GraphQLError('Saving book to author failed', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                invalidArgs: args.author,
+                error
+              }
+            })
+          }
         }
 
         pubSub.publish("BOOK_ADDED", { bookAdded: newBook })
